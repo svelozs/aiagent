@@ -1,14 +1,10 @@
 from fastapi import FastAPI
-from fastapi.responses import XMLResponse
+from fastapi.responses import Response  # Cambié XMLResponse por Response
 
 app = FastAPI()
 
-@app.post("/incoming_call")
-async def incoming_call():
-    response = """
-    <Response>
-        <Say voice="alice">Hola, esta es una prueba de Twilio con FastAPI.</Say>
-        <Hangup/>
-    </Response>
-    """
-    return XMLResponse(content=response)
+@app.get("/", response_class=Response)
+async def read_root():
+    xml_content = """<?xml version="1.0" encoding="UTF-8"?>
+    <message>Hello, World!</message>"""
+    return Response(content=xml_content, media_type="application/xml")

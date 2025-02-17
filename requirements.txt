@@ -3,3 +3,4 @@ websockets
 fastapi
 google-cloud-speech
 google-auth
+google-api-python-client==2.89.0

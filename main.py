@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, WebSocket
 from fastapi.responses import Response
 
 app = FastAPI()
@@ -7,6 +7,22 @@ app = FastAPI()
 async def webhook():
     xml_content = """<?xml version="1.0" encoding="UTF-8"?>
     <Response>
-        <Say voice="Polly.Lupe" language="es-MX">Hola, mi nombre es Sonia Veloz y estoy aquí para atenderte. ¿En qué puedo ayudarte?</Say>
+        <Connect>
+            <Stream url="wss://web-production-1ca6a.up.railway.app/media"/>
+        </Connect>
     </Response>"""
     return Response(content=xml_content, media_type="application/xml")
+
+@app.websocket("/media")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept()
+    print("WebSocket conectado. Recibiendo audio...")
+    try:
+        while True:
+            data = await websocket.receive_bytes()
+            print(f"Recibido {len(data)} bytes de audio")
+            # Aquí procesaremos el audio con IA
+    except Exception as e:
+        print(f"Error en WebSocket: {e}")
+    finally:
+        print("WebSocket desconectado")

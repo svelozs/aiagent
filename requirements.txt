@@ -2,3 +2,4 @@ uvicorn[standard]
 websockets
 fastapi
 google-cloud-speech
+google-auth

@@ -2,6 +2,7 @@ from fastapi import FastAPI, WebSocket
 from fastapi.responses import Response
 import os
 from google.cloud import speech_v1p1beta1 as speech
+from google.oauth2 import service_account
 from google.protobuf.json_format import MessageToDict
 
 app = FastAPI()
@@ -21,8 +22,15 @@ async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     print("✅ WebSocket conectado. Recibiendo datos...")
 
-    # Inicializar el cliente de Google Speech-to-Text
-    client = speech.SpeechClient()
+    # Cargar las credenciales explícitamente
+    google_credentials_path = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
+
+    if google_credentials_path:
+        credentials = service_account.Credentials.from_service_account_file(google_credentials_path)
+        client = speech.SpeechClient(credentials=credentials)
+    else:
+        print("❌ No se encuentran las credenciales.")
+        return  # Si no se encuentran las credenciales, no podemos continuar
 
     try:
         while True:

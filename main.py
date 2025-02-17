@@ -5,12 +5,11 @@ from google.cloud import speech_v1p1beta1 as speech
 from fastapi import FastAPI, WebSocket
 from fastapi.responses import Response
 
-# Asegúrate de que las credenciales se carguen correctamente desde la variable de entorno
-google_credentials_json = os.getenv('GOOGLE_CREDENTIALS_JSON')
+import json
+google_credentials_json = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
 
 if google_credentials_json:
-    # Cargar las credenciales a partir del contenido JSON de la variable de entorno
-    credentials_info = json.loads(google_credentials_json)
+    credentials_info = json.loads(google_credentials_json)  # Convertir el string a un diccionario
     credentials = service_account.Credentials.from_service_account_info(credentials_info)
     client = speech.SpeechClient(credentials=credentials)
 else:

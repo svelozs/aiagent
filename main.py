@@ -1,15 +1,17 @@
+import os
+import json
+from google.oauth2 import service_account
+from google.cloud import speech_v1p1beta1 as speech
 from fastapi import FastAPI, WebSocket
 from fastapi.responses import Response
-import os
-from google.cloud import speech_v1p1beta1 as speech
-from google.oauth2 import service_account
-from google.protobuf.json_format import MessageToDict
 
-# Cargar las credenciales desde las variables de entorno en Railway
-google_credentials_path = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
+# Asegúrate de que las credenciales se carguen correctamente desde la variable de entorno
+google_credentials_json = os.getenv('GOOGLE_CREDENTIALS_JSON')
 
-if google_credentials_path:
-    credentials = service_account.Credentials.from_service_account_file(google_credentials_path)
+if google_credentials_json:
+    # Cargar las credenciales a partir del contenido JSON de la variable de entorno
+    credentials_info = json.loads(google_credentials_json)
+    credentials = service_account.Credentials.from_service_account_info(credentials_info)
     client = speech.SpeechClient(credentials=credentials)
 else:
     print("❌ No se encuentran las credenciales.")
@@ -32,9 +34,9 @@ async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     print("✅ WebSocket conectado. Recibiendo datos...")
 
+    # Si las credenciales no se cargaron correctamente, terminamos la conexión.
     if not client:
-        print("❌ No se pudo inicializar el cliente de Google Cloud Speech.")
-        await websocket.send_text("❌ No se pudo inicializar el cliente de Google Cloud Speech.")
+        await websocket.send_text("❌ No se pudieron cargar las credenciales.")
         return
 
     try:
@@ -53,7 +55,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 # Convertir los bytes de audio en texto usando Google Cloud Speech
                 audio = speech.RecognitionAudio(content=data["bytes"])
 
-                # Configuración de la solicitud (ajustar si es necesario)
+                # Configuración de la solicitud (ajustar según el idioma o detalles que necesites)
                 config = speech.RecognitionConfig(
                     encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
                     sample_rate_hertz=16000,
@@ -68,7 +70,7 @@ async def websocket_endpoint(websocket: WebSocket):
                     transcript = result.alternatives[0].transcript
                     print(f"🎤 Transcripción: {transcript}")
 
-                    # Enviar la respuesta transcrita al WebSocket
+                    # Enviar la respuesta al WebSocket
                     await websocket.send_text(f"Respuesta transcrita: {transcript}")
 
     except Exception as e:

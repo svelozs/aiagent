@@ -16,11 +16,21 @@ async def webhook():
 @app.websocket("/media")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
-    print("✅ WebSocket conectado. Recibiendo audio...")
+    print("✅ WebSocket conectado. Recibiendo datos...")
+
     try:
         while True:
-            data = await websocket.receive_bytes()
-            print(f"🔊 Recibido {len(data)} bytes de audio")
+            data = await websocket.receive()
+            
+            # 📌 Imprimimos lo que Twilio está enviando
+            print(f"📥 Recibido: {data}")
+
+            # 🔍 Verificamos si es texto o bytes
+            if "text" in data:
+                print("📜 Twilio envió texto:", data["text"])
+            elif "bytes" in data:
+                print(f"🔊 Twilio envió {len(data['bytes'])} bytes de audio")
+
     except Exception as e:
         print(f"❌ Error en WebSocket: {e}")
     finally:

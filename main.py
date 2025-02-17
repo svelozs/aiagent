@@ -39,7 +39,7 @@ async def webhook():
     xml_content = """<?xml version="1.0" encoding="UTF-8"?>
     <Response>
         <Connect>
-            <Stream url="wss://your-railway-url/media" />
+            <Stream url="wss://web-production-1ca6a.up.railway.app" />
         </Connect>
     </Response>"""
     return Response(content=xml_content, media_type="application/xml")

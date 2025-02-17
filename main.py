@@ -5,7 +5,7 @@ from google.cloud import speech_v1p1beta1 as speech
 from google.protobuf.json_format import MessageToDict
 
 # Configurar la API Key de Google
-os.environ["GOOGLE_API_KEY"] = "tu_api_key_aqui"
+os.environ["GOOGLE_API_KEY"] = "AIzaSyAy9IV7l1Xj6_VW84qzX0CeYrv7A6A_LF0"
 
 app = FastAPI()
 
